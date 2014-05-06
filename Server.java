@@ -77,7 +77,7 @@ class ThreadHandler implements Runnable {
       String password = props.getProperty("jdbc.password");
 
       System.out.println("url="+url+" user="+username+" password="+password);
-
+	try {Class.forName("com.mysql.Driver");} catch (Exception e) {System.out.println("Driver broked");}
       return DriverManager.getConnection( url, username, password);
    }
 
