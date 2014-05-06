@@ -24,7 +24,7 @@ public class Client_Test {
 				java.io.PrintWriter writer = new java.io.PrintWriter(serverCon.getOutputStream(), true);
 				
 				// Write the command to the server's input pipe (server uses readLine, so use writer.println())
-				writer.println("CLIENT: " + cmd);
+				writer.println(cmd);
 				
 				// Send the data to the server
 				writer.flush();
