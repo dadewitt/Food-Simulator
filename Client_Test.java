@@ -9,7 +9,7 @@ public class Client_Test {
 			Scanner inp = new Scanner(System.in);
 			
 			// Open socket to connect to the server; first argument is the host, second argument is the port
-			Socket serverCon = new Socket("localhost", 3001);
+			Socket serverCon = new Socket("sslab01.cs.purdue.edu", 3001);
 			
 			// Store commend
 			String cmd = "";
