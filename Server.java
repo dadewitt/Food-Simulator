@@ -88,62 +88,64 @@ class ThreadHandler implements Runnable {
 
 	// Get parameters of the call
 	String request;
-		
-	while ( (request = in.nextLine()) != null) {
+	
+	try {
+		while ( (request = in.nextLine()) != null) {
 
-		System.out.println("Request="+request);
+			System.out.println("Request="+request);
 
-		String requestSyntax = "Syntax: SAVE;user;password;Score;MAC;Lat;Lon";
+			String requestSyntax = "Syntax: SAVE;user;password;Score;MAC;Lat;Lon";
 
-		try {
-			// Get arguments.
-			// The format is COMMAND|USER|PASSWORD|OTHER|ARGS...
-			String [] args = request.split(";");
+			try {
+				// Get arguments.
+				// The format is COMMAND|USER|PASSWORD|OTHER|ARGS...
+				String [] args = request.split(";");
 
-			// Print arguments
-			for (int i = 0; i < args.length; i++) {
-				System.out.println("Arg "+i+": "+args[i]);
+				// Print arguments
+				for (int i = 0; i < args.length; i++) {
+					System.out.println("Arg "+i+": "+args[i]);
+				}
+
+				// Get command and password
+				String command = args[0];
+				String user = args[1];
+				String password = args[2];
+
+				// Check user and password. Now it is sent in plain text.
+				// You should use Secure Sockets (SSL) for a production environment.
+				if ( !user.equals(ServerUser) || !password.equals(ServerPassword)) {
+					System.out.println("Bad user or password");
+					out.println("Bad user or password");
+					return;
+				}
+
+				// Do the operation
+				if (command.equals("TEST")) {
+					System.out.println("Do the test");
+					testDB(args, out);
+				} else if (command.equals("SAVE")) {
+					saveDB(args, out);
+				} else if (command.equals("GET")) {
+					getDB(args, out);
+				}
+				/*
+				if (command.equals("GET-ALL-PETS")) {
+					//getAllPets(args, out);
+				}
+				else if (command.equals("GET-PET-INFO")) {
+					//getPetInfo(args, out);
+				}
+				*/
 			}
+			catch (Exception e) {		
+				System.out.println(requestSyntax);
+				out.println(requestSyntax);
 
-			// Get command and password
-			String command = args[0];
-			String user = args[1];
-			String password = args[2];
-
-			// Check user and password. Now it is sent in plain text.
-			// You should use Secure Sockets (SSL) for a production environment.
-			if ( !user.equals(ServerUser) || !password.equals(ServerPassword)) {
-				System.out.println("Bad user or password");
-				out.println("Bad user or password");
-				return;
+				System.out.println(e.toString());
+				out.println(e.toString());
 			}
-
-			// Do the operation
-			if (command.equals("TEST")) {
-				System.out.println("Do the test");
-				testDB(args, out);
-			} else if (command.equals("SAVE")) {
-				saveDB(args, out);
-			} else if (command.equals("GET")) {
-				getDB(args, out);
-			}
-			/*
-			if (command.equals("GET-ALL-PETS")) {
-				//getAllPets(args, out);
-			}
-			else if (command.equals("GET-PET-INFO")) {
-				//getPetInfo(args, out);
-			}
-			*/
 		}
-		catch (Exception e) {		
-			System.out.println(requestSyntax);
-			out.println(requestSyntax);
-
-			System.out.println(e.toString());
-			out.println(e.toString());
-		}
-	}
+	} catch (Exception e) {/*Dont' worry! Be happy, don't worry now!*/}
    }
    
     void saveDB( String [] args, PrintWriter out) {
@@ -286,7 +288,7 @@ class ThreadHandler implements Runnable {
             incoming.close();
          }*/
       }
-      catch (IOException e)
+      catch (Exception e)
       {  
          e.printStackTrace();
       }
