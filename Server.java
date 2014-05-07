@@ -140,29 +140,23 @@ class ThreadHandler implements Runnable {
 	}
    }
    
-    void testDB(String args[], PrintWriter out) {
-		      Connection conn=null;
+    void testDB( String [] args, PrintWriter out) {
+
+      Connection conn=null;
       try
       {
 	conn = getConnection();
-	System.out.println("Got connection");
         Statement stat = conn.createStatement();
 	
 	ResultSet result = stat.executeQuery( "SELECT * FROM user");
-	System.out.println("Sent query ...");
 
 	while(result.next()) {
-			System.out.println(result.getString(1)+"|");
-			System.out.println(result.getString(2)+"|");
-			System.out.println(result.getString(3)+"|");
-			System.out.println(result.getString(4)+"|");
-			System.out.println(result.getString(5)+"|");
-       	//	out.print(result.getString(1)+"|");
-       	//	out.print(result.getString(2)+"|");
-       	//	out.print(result.getString(3)+"|");
-       	//	out.print(result.getString(4)+"|");
-       	//	out.print(result.getString(5));
-	//	out.println("");
+       		out.print(result.getString(1)+"|");
+       		out.print(result.getString(2)+"|");
+       		out.print(result.getString(3)+"|");
+       		out.print(result.getString(4)+"|");
+       		out.print(result.getString(5));
+		out.println("");
 	}
 
 	result.close();
@@ -183,7 +177,6 @@ class ThreadHandler implements Runnable {
 
       }
       catch (Exception e) {
-      	System.out.println("Something broke!");
 	System.out.println(e.toString());
 	out.println(e.toString());
       }
@@ -195,7 +188,7 @@ class ThreadHandler implements Runnable {
 	catch (Exception e) {
 	}
       }
-    }
+   }
 
    public void run() {  
       try
