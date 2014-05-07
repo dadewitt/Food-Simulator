@@ -119,6 +119,7 @@ class ThreadHandler implements Runnable {
 
 		// Do the operation
 		if (command.equals("TEST")) {
+			System.out.println("Do the test");
 			testDB(args, out);
 		}
 		
@@ -144,6 +145,7 @@ class ThreadHandler implements Runnable {
       try
       {
 	conn = getConnection();
+	System.out.println("Got connection");
         Statement stat = conn.createStatement();
 	
 	ResultSet result = stat.executeQuery( "SELECT * FROM user");
