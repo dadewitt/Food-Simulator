@@ -145,6 +145,7 @@ class ThreadHandler implements Runnable {
 				out.println(e.toString());
 			}
 		}
+		System.out.println("Exit the loop");
 	} catch (Exception e) {/*Dont' worry! Be happy, don't worry now!*/}
    }
    
