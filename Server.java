@@ -280,11 +280,11 @@ class ThreadHandler implements Runnable {
       	 catch (IOException e)
          {  
             e.printStackTrace();
-         }
+         }/*
          finally
          {
             incoming.close();
-         }
+         }*/
       }
       catch (IOException e)
       {  
