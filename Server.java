@@ -9,15 +9,12 @@ import HTTP.HttpReader;
 
 
 public class Server {
-
-	private static ServerSocket server;
-
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
 			int clientId = 0;
-			server = new ServerSocket(3001);
+			ServerSocket server = new ServerSocket(3001);
 			System.out.println("Server started at " + server.getLocalSocketAddress() + ":" + server.getLocalPort() + "\n");
 			while (true) {
 			
@@ -42,13 +39,14 @@ public class Server {
 				System.out.println("Client Disconnected.\n");
 				*/
 				Socket incoming = server.accept();
+				System.out.println("ADDR: " + incoming.getRemoteSocketAddress());
 				System.out.println("Spawning " + clientId);
 				Runnable r = new ThreadHandler(incoming);
 				Thread t = new Thread(r);
 				t.start();
 				clientId++;
 			}				
-		} catch (Exception e) {		}
+		} catch (Exception e) {	e.printStackTrace();	}
 	}
 
 }
@@ -77,7 +75,6 @@ class ThreadHandler implements Runnable {
       String password = props.getProperty("jdbc.password");
 
       System.out.println("url="+url+" user="+username+" password="+password);
-	try {Class.forName("com.mysql.Driver");} catch (Exception e) {System.out.println("Driver broked");}
       return DriverManager.getConnection( url, username, password);
    }
 
@@ -119,16 +116,19 @@ class ThreadHandler implements Runnable {
 
 		// Do the operation
 		if (command.equals("TEST")) {
+			System.out.println("Do the test");
 			testDB(args, out);
+		} else if (command.equals("SAVE")) {
+			saveDB(args, out);
 		}
-		
+		/*
 		if (command.equals("GET-ALL-PETS")) {
 			//getAllPets(args, out);
 		}
 		else if (command.equals("GET-PET-INFO")) {
 			//getPetInfo(args, out);
 		}
-		
+		*/
 	}
 	catch (Exception e) {		
 		System.out.println(requestSyntax);
@@ -139,45 +139,29 @@ class ThreadHandler implements Runnable {
 	}
    }
    
-    void testDB(String args[], PrintWriter out) {
-		      Connection conn=null;
+    void saveDB( String [] args, PrintWriter out) {
+
+      Connection conn=null;
       try
       {
 	conn = getConnection();
         Statement stat = conn.createStatement();
 	
-	ResultSet result = stat.executeQuery( "SELECT * FROM user");
+	ResultSet result = stat.executeQuery( "UPDATE user " + 
+											"SET latitude=" + args[3] + ", longitude=" + args[4] + ", score=" + args[6] + " " + 
+											"WHERE mac='" + args[5] + "' IF @@ROWCOUNT=0 " + 
+											"INSERT INTO user VALUES (0," + args[3] + "," + args[4] + ",'" + args[5] + "'," + args[6] + ")");
 
-	while(result.next()) {
-			System.out.println(result.getString(1)+"|");
-			System.out.println(result.getString(2)+"|");
-			System.out.println(result.getString(3)+"|");
-			System.out.println(result.getString(4)+"|");
-			System.out.println(result.getString(5)+"|");
+	/*while(result.next()) {
        		out.print(result.getString(1)+"|");
        		out.print(result.getString(2)+"|");
        		out.print(result.getString(3)+"|");
        		out.print(result.getString(4)+"|");
        		out.print(result.getString(5));
 		out.println("");
-	}
+	}*/
 
 	result.close();
-
-	/*
- 	stat.executeUpdate(
-           "CREATE TABLE Greetings (Message CHAR(20))");
-        stat.executeUpdate(
-           "INSERT INTO Greetings VALUES ('Hello, World!')");
-	ResultSet result = 
-            stat.executeQuery(
-               "SELECT * FROM Greetings");
-         while(result.next())
-            System.out.println(result.getString(1));
-         result.close();
-         stat.executeUpdate("DROP TABLE Greetings");
-	*/
-
       }
       catch (Exception e) {
 	System.out.println(e.toString());
@@ -191,7 +175,42 @@ class ThreadHandler implements Runnable {
 	catch (Exception e) {
 	}
       }
-    }
+   }
+   
+    void testDB( String [] args, PrintWriter out) {
+
+      Connection conn=null;
+      try
+      {
+	conn = getConnection();
+        Statement stat = conn.createStatement();
+	
+	ResultSet result = stat.executeQuery( "SELECT * FROM user");
+
+	while(result.next()) {
+       		out.print(result.getString(1)+"|");
+       		out.print(result.getString(2)+"|");
+       		out.print(result.getString(3)+"|");
+       		out.print(result.getString(4)+"|");
+       		out.print(result.getString(5));
+		out.println("");
+	}
+
+	result.close();
+      }
+      catch (Exception e) {
+	System.out.println(e.toString());
+	out.println(e.toString());
+      }
+      finally
+      {
+	try {
+         if (conn!=null) conn.close();
+	}
+	catch (Exception e) {
+	}
+      }
+   }
 
    public void run() {  
       try

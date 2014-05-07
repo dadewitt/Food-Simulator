@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.os.CountDownTimer;
 import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +20,11 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
-    Button button;
+    ImageButton cookie;
+    Button retry;
+    TextView timer;
     GPSTracker gps;
+    MyCountDown myCountDown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +37,17 @@ public class MainActivity extends Activity {
         final LocationListener mlocListener = new MyLocationListener();
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
         */
-        button = (Button) findViewById(R.id.button1);
-        button.setOnClickListener(new OnClickListener(){
+        cookie = (ImageButton) findViewById(R.id.cookie);
+        retry = (Button) findViewById(R.id.retry);
+        timer = (TextView) findViewById(R.id.timeDisplay);
+        myCountDown = new MyCountDown(30000, 1000);
+
+        retry.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v){
+
+                myCountDown.start();
+                game();
                 gps = new GPSTracker(MainActivity.this);
 
                 if(gps.canGetLocation()){
@@ -50,6 +63,27 @@ public class MainActivity extends Activity {
             }
         });
 
+    }
+
+    public class MyCountDown extends CountDownTimer{
+        public MyCountDown(long millisInFuture, long countDownInterval){
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onFinish(){
+            timer.setText("Time: FINISHED");
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished){
+            timer.setText("Time: " + millisUntilFinished/1000);
+        }
+    }
+    public void game(){
+
+
+        return;
     }
 
 }
