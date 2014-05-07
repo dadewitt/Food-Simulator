@@ -26,7 +26,12 @@ public class Client_Test {
 				
 				if (cmd.equals("read")) {
 					java.io.BufferedReader rdr = new java.io.BufferedReader( new java.io.InputStreamReader( serverCon.getInputStream() ) );
-					System.out.println(rdr.readLine());
+					String line;
+					while ( rdr.ready()) {
+						line = rdr.readLine();
+						System.out.println(line);
+					}
+					continue;
 				}
 				
 				// Open a PrintWriter to be able to write (string) messages to the server

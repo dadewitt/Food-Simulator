@@ -1,6 +1,8 @@
 import java.net.*;
 import java.io.*;
 
+import java.lang.Math;
+
 import java.util.*;
 import java.sql.*;
 
@@ -85,58 +87,66 @@ class ThreadHandler implements Runnable {
                                       true /* autoFlush */);
 
 	// Get parameters of the call
-	String request = in.nextLine();
-
-	System.out.println("Request="+request);
-
-	String requestSyntax = "Syntax: SAVE;user;password;Score;MAC;Lat;Lon";
-
+	String request;
+	
 	try {
-		// Get arguments.
-		// The format is COMMAND|USER|PASSWORD|OTHER|ARGS...
-		String [] args = request.split(";");
+		while ( (request = in.nextLine()) != null) {
 
-		// Print arguments
-		for (int i = 0; i < args.length; i++) {
-			System.out.println("Arg "+i+": "+args[i]);
-		}
+			System.out.println("Request="+request);
 
-		// Get command and password
-		String command = args[0];
-		String user = args[1];
-		String password = args[2];
+			String requestSyntax = "Syntax: SAVE;user;password;Score;MAC;Lat;Lon";
 
-		// Check user and password. Now it is sent in plain text.
-		// You should use Secure Sockets (SSL) for a production environment.
-		if ( !user.equals(ServerUser) || !password.equals(ServerPassword)) {
-			System.out.println("Bad user or password");
-			out.println("Bad user or password");
-			return;
-		}
+			try {
+				// Get arguments.
+				// The format is COMMAND|USER|PASSWORD|OTHER|ARGS...
+				String [] args = request.split(";");
 
-		// Do the operation
-		if (command.equals("TEST")) {
-			System.out.println("Do the test");
-			testDB(args, out);
-		} else if (command.equals("SAVE")) {
-			saveDB(args, out);
-		}
-		/*
-		if (command.equals("GET-ALL-PETS")) {
-			//getAllPets(args, out);
-		}
-		else if (command.equals("GET-PET-INFO")) {
-			//getPetInfo(args, out);
-		}
-		*/
-	}
-	catch (Exception e) {		
-		System.out.println(requestSyntax);
-		out.println(requestSyntax);
+				// Print arguments
+				for (int i = 0; i < args.length; i++) {
+					System.out.println("Arg "+i+": "+args[i]);
+				}
 
-		System.out.println(e.toString());
-		out.println(e.toString());
-	}
+				// Get command and password
+				String command = args[0];
+				String user = args[1];
+				String password = args[2];
+
+				// Check user and password. Now it is sent in plain text.
+				// You should use Secure Sockets (SSL) for a production environment.
+				if ( !user.equals(ServerUser) || !password.equals(ServerPassword)) {
+					System.out.println("Bad user or password");
+					out.println("Bad user or password");
+					return;
+				}
+
+				// Do the operation
+				if (command.equals("TEST")) {
+					System.out.println("Do the test");
+					testDB(args, out);
+				} else if (command.equals("SAVE")) {
+					saveDB(args, out);
+				} else if (command.equals("GET")) {
+					getDB(args, out);
+				}
+				/*
+				if (command.equals("GET-ALL-PETS")) {
+					//getAllPets(args, out);
+				}
+				else if (command.equals("GET-PET-INFO")) {
+					//getPetInfo(args, out);
+				}
+				*/
+			}
+			catch (Exception e) {		
+				System.out.println(requestSyntax);
+				out.println(requestSyntax);
+
+				System.out.println(e.toString());
+				out.println(e.toString());
+			}
+		}
+		System.out.println("Exit the loop");
+	} catch (Exception e) {/*Dont' worry! Be happy, don't worry now!*/}
    }
    
     void saveDB( String [] args, PrintWriter out) {
@@ -147,10 +157,8 @@ class ThreadHandler implements Runnable {
 	conn = getConnection();
         Statement stat = conn.createStatement();
 	
-	ResultSet result = stat.executeQuery( "UPDATE user " + 
-											"SET latitude=" + args[3] + ", longitude=" + args[4] + ", score=" + args[6] + " " + 
-											"WHERE mac='" + args[5] + "' IF @@ROWCOUNT=0 " + 
-											"INSERT INTO user VALUES (0," + args[3] + "," + args[4] + ",'" + args[5] + "'," + args[6] + ")");
+	stat.executeUpdate( "INSERT INTO user (mac, latitude, longitude, score) values ('" + args[5] + "'," + args[3] + "," + args[4] + "," + args[6] + ") " + 
+											"on duplicate key update latitude=values(latitude), longitude=values(longitude), score=values(score);");
 
 	/*while(result.next()) {
        		out.print(result.getString(1)+"|");
@@ -160,6 +168,51 @@ class ThreadHandler implements Runnable {
        		out.print(result.getString(5));
 		out.println("");
 	}*/
+
+	//result.close();
+      }
+      catch (Exception e) {
+	System.out.println(e.toString());
+	out.println(e.toString());
+      }
+      finally
+      {
+	try {
+         if (conn!=null) conn.close();
+	}
+	catch (Exception e) {
+	}
+      }
+   }
+   
+    void getDB( String [] args, PrintWriter out) {
+
+      Connection conn=null;
+      try
+      {
+	conn = getConnection();
+        Statement stat = conn.createStatement();
+	
+	ResultSet result = stat.executeQuery( "SELECT latitude, longitude FROM user WHERE score > " + args[4] + " AND mac <> '" + args[3] + "'");
+	System.out.println("QUERY: " + "SELECT latitude, longitude FROM user WHERE score > " + args[4] + " AND mac <> '" + args[3] + "'");
+	double mylat = Double.parseDouble(args[5]);
+	double mylon = Double.parseDouble(args[6]);
+	double closest[] = { mylat, mylon, 90000001 };
+	while(result.next()) {
+			System.out.print(result.getString(1)+" ");
+			System.out.println(result.getString(2));
+			double lat = Double.parseDouble(result.getString(1));
+			double lon = Double.parseDouble(result.getString(2));
+			double distance = Math.sqrt( Math.pow(lat-mylat, 2) + Math.pow(lon-mylon, 2) );
+			System.out.println("Comparing: (" + lat + ", " + lon + ")");
+			if ( distance < closest[2] ) {
+				closest[0] = lat;
+				closest[1] = lon;
+				closest[2] = distance;
+			}
+	}
+    out.println(closest[0]+" "+closest[1]);
+    System.out.println(closest[0]+" "+closest[1]);
 
 	result.close();
       }
@@ -188,6 +241,11 @@ class ThreadHandler implements Runnable {
 	ResultSet result = stat.executeQuery( "SELECT * FROM user");
 
 	while(result.next()) {
+			System.out.print(result.getString(1)+"|");
+			System.out.print(result.getString(2)+"|");
+			System.out.print(result.getString(3)+"|");
+			System.out.print(result.getString(4)+"|");
+			System.out.println(result.getString(5)+"|");
        		out.print(result.getString(1)+"|");
        		out.print(result.getString(2)+"|");
        		out.print(result.getString(3)+"|");
@@ -225,13 +283,13 @@ class ThreadHandler implements Runnable {
       	 catch (IOException e)
          {  
             e.printStackTrace();
-         }
+         }/*
          finally
          {
             incoming.close();
-         }
+         }*/
       }
-      catch (IOException e)
+      catch (Exception e)
       {  
          e.printStackTrace();
       }

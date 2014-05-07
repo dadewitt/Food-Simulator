@@ -14,8 +14,18 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.os.CountDownTimer;
 import android.widget.Toast;
+<<<<<<< HEAD
 import java.util.*;
 
+=======
+import android.os.StrictMode;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
+>>>>>>> f88e6d0042dbbd8bd61955d7f9121afad463ce97
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -82,9 +92,12 @@ public class MainActivity extends Activity {
             cookie.setVisibility(View.INVISIBLE);
             timer.setText("Time: FINISHED");
 
+            // Show score at location
+            double latitude = 0.0f;
+            double longitude = 0.0f;
             if(gps.canGetLocation()){
-                double latitude = gps.getLatitude();
-                double longitude = gps.getLongitude();
+                latitude = gps.getLatitude();
+                longitude = gps.getLongitude();
 
                 Toast.makeText(getApplicationContext(), "Score is - \n" + score + "\nLocation is - \nLat: " + latitude
                         + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
@@ -92,6 +105,67 @@ public class MainActivity extends Activity {
             else{
                 gps.showSettingsAlert();
             }
+
+            // build MAC address
+            // referenced from http://www.mkyong.com/java/how-to-get-mac-address-in-java/
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                // allow for networking on main thread
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            StringBuilder sbMAC = new StringBuilder();
+            try {
+                InetAddress ip = InetAddress.getLocalHost();
+                Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
+                while(networks.hasMoreElements()) {
+                    if(sbMAC.length() > 0) break;
+                    NetworkInterface network = networks.nextElement();
+                    byte[] mac = network.getHardwareAddress();
+                    if(mac == null) continue;
+                    for (int i = 0; i < mac.length; i++) {
+                        sbMAC.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                }
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            } catch (SocketException e){
+                e.printStackTrace();
+            }
+
+            /* Build message to server in the form
+             * "SAVE;*user*;*password*;*score*;*MAC*;*latitude*;*longitude"
+             * "GET;*user*;*password*;*MAC*
+             */
+            try {
+                // Open socket to connect to the server; first argument is the host, second argument is the port
+                String host = "sslab01.cs.purdue.edu";
+                Socket serverCon = new Socket(host, 3001);
+
+                StringBuilder sbServerUpdate = new StringBuilder();
+                StringBuilder sbServerGet = new StringBuilder();
+
+                //SAVE
+                sbServerUpdate.append("SAVE;user;password;");
+                sbServerUpdate.append(Integer.toString(score)+";");
+                sbServerUpdate.append(sbMAC.toString()+";");
+                sbServerUpdate.append(Long.toString((long)latitude)+";");
+                sbServerUpdate.append(Long.toString((long)longitude));
+                //GET
+                sbServerGet.append("GET;user;password;");
+                sbServerGet.append(sbMAC.toString());
+
+                // Open a PrintWriter to be able to write (string) messages to the server
+                java.io.PrintWriter writer = new java.io.PrintWriter(serverCon.getOutputStream(), true);
+
+                // Write the command to the server's input pipe (server uses readLine, so use writer.println())
+                writer.println(sbServerUpdate.toString());
+
+                // Send the data to the server
+                writer.flush();
+
+                // Close the connection to the server
+                serverCon.close();
+            } catch (Exception e) {}
         }
 
         @Override
