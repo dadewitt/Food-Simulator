@@ -147,10 +147,8 @@ class ThreadHandler implements Runnable {
 	conn = getConnection();
         Statement stat = conn.createStatement();
 	
-	ResultSet result = stat.executeQuery( "UPDATE user " + 
-											"SET latitude=" + args[3] + ", longitude=" + args[4] + ", score=" + args[6] + " " + 
-											"WHERE mac='" + args[5] + "' IF @@ROWCOUNT=0 " + 
-											"INSERT INTO user VALUES (0," + args[3] + "," + args[4] + ",'" + args[5] + "'," + args[6] + ")");
+	stat.executeUpdate( "INSERT INTO user (mac, latitude, longitude, score) values ('" + args[5] + "'," + args[3] + "," + args[4] + "," + args[6] + ") " + 
+											"on duplicate key update latitude=values(latitude), longitude=values(longitude), score=values(score);");
 
 	/*while(result.next()) {
        		out.print(result.getString(1)+"|");
@@ -161,7 +159,7 @@ class ThreadHandler implements Runnable {
 		out.println("");
 	}*/
 
-	result.close();
+	//result.close();
       }
       catch (Exception e) {
 	System.out.println(e.toString());
@@ -188,6 +186,11 @@ class ThreadHandler implements Runnable {
 	ResultSet result = stat.executeQuery( "SELECT * FROM user");
 
 	while(result.next()) {
+			System.out.print(result.getString(1)+"|");
+			System.out.print(result.getString(2)+"|");
+			System.out.print(result.getString(3)+"|");
+			System.out.print(result.getString(4)+"|");
+			System.out.println(result.getString(5)+"|");
        		out.print(result.getString(1)+"|");
        		out.print(result.getString(2)+"|");
        		out.print(result.getString(3)+"|");
