@@ -9,15 +9,12 @@ import HTTP.HttpReader;
 
 
 public class Server {
-
-	private static ServerSocket server;
-
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
 			int clientId = 0;
-			server = new ServerSocket(3001);
+			ServerSocket server = new ServerSocket(3001);
 			System.out.println("Server started at " + server.getLocalSocketAddress() + ":" + server.getLocalPort() + "\n");
 			while (true) {
 			
@@ -49,7 +46,7 @@ public class Server {
 				t.start();
 				clientId++;
 			}				
-		} catch (Exception e) {		}
+		} catch (Exception e) {	e.printStackTrace();	}
 	}
 
 }
@@ -122,14 +119,14 @@ class ThreadHandler implements Runnable {
 			System.out.println("Do the test");
 			testDB(args, out);
 		}
-		
+		/*
 		if (command.equals("GET-ALL-PETS")) {
 			//getAllPets(args, out);
 		}
 		else if (command.equals("GET-PET-INFO")) {
 			//getPetInfo(args, out);
 		}
-		
+		*/
 	}
 	catch (Exception e) {		
 		System.out.println(requestSyntax);
