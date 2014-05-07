@@ -186,7 +186,7 @@ class ThreadHandler implements Runnable {
         Statement stat = conn.createStatement();
 	
 	ResultSet result = stat.executeQuery( "SELECT latitude, longitude FROM user WHERE score > " + args[4] + " AND mac <> '" + args[3] + "'");
-
+	System.out.println("QUERY: " + "SELECT latitude, longitude FROM user WHERE score > " + args[4] + " AND mac <> '" + args[3] + "'");
 	double mylat = Double.parseDouble(args[5]);
 	double mylon = Double.parseDouble(args[6]);
 	double closest[3] = { mylat, mylon, 90000001 }
