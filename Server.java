@@ -147,6 +147,7 @@ class ThreadHandler implements Runnable {
         Statement stat = conn.createStatement();
 	
 	ResultSet result = stat.executeQuery( "SELECT * FROM user");
+	System.out.println("Sent query ...");
 
 	while(result.next()) {
 			System.out.println(result.getString(1)+"|");
