@@ -50,16 +50,6 @@ public class MainActivity extends Activity {
                 game();
                 gps = new GPSTracker(MainActivity.this);
 
-                if(gps.canGetLocation()){
-                    double latitude = gps.getLatitude();
-                    double longitude = gps.getLongitude();
-
-                    Toast.makeText(getApplicationContext(), "Location is - \nLat: " + latitude
-                    + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    gps.showSettingsAlert();
-                }
             }
         });
 
@@ -72,6 +62,16 @@ public class MainActivity extends Activity {
 
         @Override
         public void onFinish(){
+            if(gps.canGetLocation()){
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+
+                Toast.makeText(getApplicationContext(), "Location is - \nLat: " + latitude
+                        + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
+            }
+            else{
+                gps.showSettingsAlert();
+            }
             timer.setText("Time: FINISHED");
         }
 
