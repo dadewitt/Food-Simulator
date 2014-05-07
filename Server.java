@@ -196,6 +196,7 @@ class ThreadHandler implements Runnable {
 			double lat = Double.parseDouble(result.getString(1));
 			double lon = Double.parseDouble(result.getString(2));
 			double distance = Math.sqrt( Math.pow(lat-mylat, 2) + Math.pow(lon-mylon, 2) );
+			System.out.println("Comparing: (" + lat + ", " + lon + ")");
 			if ( distance < closest[2] ) {
 				closest[0] = lat;
 				closest[1] = lon;
@@ -203,6 +204,7 @@ class ThreadHandler implements Runnable {
 			}
 	}
     out.println(closest[0]+" "+closest[1]);
+    System.out.println(closest[0]+" "+closest[1]);
 
 	result.close();
       }
