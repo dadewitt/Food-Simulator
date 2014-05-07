@@ -14,10 +14,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.os.CountDownTimer;
 import android.widget.Toast;
-<<<<<<< HEAD
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.*;
 
-=======
+
 import android.os.StrictMode;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -25,7 +27,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.net.*;
 import java.util.Enumeration;
->>>>>>> f88e6d0042dbbd8bd61955d7f9121afad463ce97
+
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,14 +95,14 @@ public class MainActivity extends Activity {
             timer.setText("Time: FINISHED");
 
             // Show score at location
-            double latitude = 0.0f;
-            double longitude = 0.0f;
+            double latitude = 0.0;
+            double longitude = 0.0;
             if(gps.canGetLocation()){
                 latitude = gps.getLatitude();
                 longitude = gps.getLongitude();
 
-                Toast.makeText(getApplicationContext(), "Score is - \n" + score + "\nLocation is - \nLat: " + latitude
-                        + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), "Score is - \n" + score + "\nLocation is - \nLat: " + latitude
+                //       + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
             }
             else{
                 gps.showSettingsAlert();
@@ -146,23 +148,44 @@ public class MainActivity extends Activity {
 
                 //SAVE
                 sbServerUpdate.append("SAVE;user;password;");
-                sbServerUpdate.append(Integer.toString(score)+";");
+                sbServerUpdate.append(Double.toString(latitude)+";");
+                sbServerUpdate.append(Double.toString(longitude) + ";");
                 sbServerUpdate.append(sbMAC.toString()+";");
-                sbServerUpdate.append(Long.toString((long)latitude)+";");
-                sbServerUpdate.append(Long.toString((long)longitude));
+                sbServerUpdate.append(Integer.toString(score));
+
                 //GET
                 sbServerGet.append("GET;user;password;");
-                sbServerGet.append(sbMAC.toString());
+                sbServerGet.append(sbMAC.toString() + ";");
+                sbServerGet.append(Integer.toString(score) + ";");
+                sbServerGet.append(Double.toString(latitude)+";");
+                sbServerGet.append(Double.toString(longitude) );
 
                 // Open a PrintWriter to be able to write (string) messages to the server
                 java.io.PrintWriter writer = new java.io.PrintWriter(serverCon.getOutputStream(), true);
+                java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(serverCon.getInputStream()));
 
                 // Write the command to the server's input pipe (server uses readLine, so use writer.println())
                 writer.println(sbServerUpdate.toString());
-
-                // Send the data to the server
+                writer.flush();
+                writer.println(sbServerGet.toString());
                 writer.flush();
 
+                String results = reader.readLine();
+                Scanner myScan = new Scanner(results);
+                double resultLat = myScan.nextDouble();
+                double resultLon = myScan.nextDouble();
+
+                Location initial = new Location("");
+                Location ending = new Location("");
+                initial.setLatitude(latitude);
+                initial.setLongitude(longitude);
+                ending.setLatitude(resultLat);
+                ending.setLongitude(resultLon);
+                float distance = initial.distanceTo(ending);
+
+                distance = distance / (float)1609.344;
+
+                Toast.makeText(getApplicationContext(), "You are the highest score within " + distance + " miles!", Toast.LENGTH_LONG ).show();
                 // Close the connection to the server
                 serverCon.close();
             } catch (Exception e) {}
