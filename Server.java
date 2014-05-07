@@ -42,6 +42,7 @@ public class Server {
 				System.out.println("Client Disconnected.\n");
 				*/
 				Socket incoming = server.accept();
+				System.out.println("ADDR: " + incoming.getRemoteSocketAddress());
 				System.out.println("Spawning " + clientId);
 				Runnable r = new ThreadHandler(incoming);
 				Thread t = new Thread(r);
@@ -77,7 +78,6 @@ class ThreadHandler implements Runnable {
       String password = props.getProperty("jdbc.password");
 
       System.out.println("url="+url+" user="+username+" password="+password);
-	//try {Class.forName("com.mysql.Driver");} catch (Exception e) {System.out.println("Driver broked");}
       return DriverManager.getConnection( url, username, password);
    }
 
@@ -157,12 +157,12 @@ class ThreadHandler implements Runnable {
 			System.out.println(result.getString(3)+"|");
 			System.out.println(result.getString(4)+"|");
 			System.out.println(result.getString(5)+"|");
-       		out.print(result.getString(1)+"|");
-       		out.print(result.getString(2)+"|");
-       		out.print(result.getString(3)+"|");
-       		out.print(result.getString(4)+"|");
-       		out.print(result.getString(5));
-		out.println("");
+       	//	out.print(result.getString(1)+"|");
+       	//	out.print(result.getString(2)+"|");
+       	//	out.print(result.getString(3)+"|");
+       	//	out.print(result.getString(4)+"|");
+       	//	out.print(result.getString(5));
+	//	out.println("");
 	}
 
 	result.close();
@@ -183,6 +183,7 @@ class ThreadHandler implements Runnable {
 
       }
       catch (Exception e) {
+      	System.out.println("Something broke!");
 	System.out.println(e.toString());
 	out.println(e.toString());
       }
