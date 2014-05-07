@@ -14,6 +14,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.os.CountDownTimer;
 import android.widget.Toast;
+
+
+
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -25,13 +28,18 @@ public class MainActivity extends Activity {
     TextView timer;
     GPSTracker gps;
     MyCountDown myCountDown;
+    TextView myScore;
+
+    int score;
+    int timerIsRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        score = 0;
+        timerIsRunning = 0;
         /*final LocationManager mlocManager =
                 (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         final LocationListener mlocListener = new MyLocationListener();
@@ -40,26 +48,25 @@ public class MainActivity extends Activity {
         cookie = (ImageButton) findViewById(R.id.cookie);
         retry = (Button) findViewById(R.id.retry);
         timer = (TextView) findViewById(R.id.timeDisplay);
+        myScore = (TextView) findViewById(R.id.score);
+        gps = new GPSTracker(MainActivity.this);
         myCountDown = new MyCountDown(30000, 1000);
 
+        cookie.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                score++;
+                myScore.setText("Score: " + score);
+            }
+        });
         retry.setOnClickListener(new OnClickListener(){
             @Override
             public void onClick(View v){
 
-                myCountDown.start();
                 game();
-                gps = new GPSTracker(MainActivity.this);
 
-                if(gps.canGetLocation()){
-                    double latitude = gps.getLatitude();
-                    double longitude = gps.getLongitude();
 
-                    Toast.makeText(getApplicationContext(), "Location is - \nLat: " + latitude
-                    + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    gps.showSettingsAlert();
-                }
+
             }
         });
 
@@ -72,15 +79,34 @@ public class MainActivity extends Activity {
 
         @Override
         public void onFinish(){
+            cookie.setVisibility(View.INVISIBLE);
             timer.setText("Time: FINISHED");
+
+            if(gps.canGetLocation()){
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+
+                Toast.makeText(getApplicationContext(), "Score is - \n" + score + "\nLocation is - \nLat: " + latitude
+                        + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();
+            }
+            else{
+                gps.showSettingsAlert();
+            }
         }
 
         @Override
         public void onTick(long millisUntilFinished){
+            timerIsRunning = (int)millisUntilFinished/1000;
             timer.setText("Time: " + millisUntilFinished/1000);
         }
+
     }
     public void game(){
+
+        score = 0;
+        myScore.setText("Score: " + score);
+        cookie.setVisibility(View.VISIBLE);
+        myCountDown.start();
 
 
         return;
