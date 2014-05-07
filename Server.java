@@ -159,7 +159,7 @@ class ThreadHandler implements Runnable {
 		out.println("");
 	}*/
 
-	result.close();
+	//result.close();
       }
       catch (Exception e) {
 	System.out.println(e.toString());
