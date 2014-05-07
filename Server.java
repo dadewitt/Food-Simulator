@@ -186,6 +186,11 @@ class ThreadHandler implements Runnable {
 	ResultSet result = stat.executeQuery( "SELECT * FROM user");
 
 	while(result.next()) {
+			System.out.print(result.getString(1)+"|");
+			System.out.print(result.getString(2)+"|");
+			System.out.print(result.getString(3)+"|");
+			System.out.print(result.getString(4)+"|");
+			System.out.println(result.getString(5)+"|");
        		out.print(result.getString(1)+"|");
        		out.print(result.getString(2)+"|");
        		out.print(result.getString(3)+"|");
