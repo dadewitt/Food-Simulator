@@ -27,7 +27,8 @@ public class Client_Test {
 				if (cmd.equals("read")) {
 					java.io.BufferedReader rdr = new java.io.BufferedReader( new java.io.InputStreamReader( serverCon.getInputStream() ) );
 					String line;
-					while ( (line = rdr.readLine()) != null) {
+					while ( rdr.ready()) {
+						line = rdr.readLine();
 						System.out.println(line);
 					}
 					continue;
