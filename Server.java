@@ -122,6 +122,8 @@ class ThreadHandler implements Runnable {
 			testDB(args, out);
 		} else if (command.equals("SAVE")) {
 			saveDB(args, out);
+		} else if (command.equals("GET")) {
+			getDB(args, out);
 		}
 		/*
 		if (command.equals("GET-ALL-PETS")) {
