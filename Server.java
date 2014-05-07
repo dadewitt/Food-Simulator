@@ -1,6 +1,8 @@
 import java.net.*;
 import java.io.*;
 
+import java.lang.Math;
+
 import java.util.*;
 import java.sql.*;
 
@@ -160,6 +162,49 @@ class ThreadHandler implements Runnable {
 	}*/
 
 	//result.close();
+      }
+      catch (Exception e) {
+	System.out.println(e.toString());
+	out.println(e.toString());
+      }
+      finally
+      {
+	try {
+         if (conn!=null) conn.close();
+	}
+	catch (Exception e) {
+	}
+      }
+   }
+   
+    void getDB( String [] args, PrintWriter out) {
+
+      Connection conn=null;
+      try
+      {
+	conn = getConnection();
+        Statement stat = conn.createStatement();
+	
+	ResultSet result = stat.executeQuery( "SELECT latitude, longitude FROM user WHERE score > " + args[4] + " AND mac <> '" + args[3] + "'");
+
+	double mylat = Double.parseDouble(args[5]);
+	double mylon = Double.parseDouble(args[6]);
+	double closest[3] = { mylat, mylon, 90000001 }
+	while(result.next()) {
+			System.out.print(result.getString(1)+" ");
+			System.out.println(result.getString(2));
+			double lat = Double.parseDouble(result.getString(1));
+			double lon = Double.parseDouble(result.getString(2));
+			double distance = Math.sqrt( Math.pow(lat-mylat, 2) + Math.pow(lon-mylon, 2) );
+			if ( distance < closest[2] ) {
+				closest[0] = lat;
+				closest[1] = lon;
+				closest[2] = distance;
+			}
+	}
+    out.println(closest[0]+" "+closest[1]);
+
+	result.close();
       }
       catch (Exception e) {
 	System.out.println(e.toString());
