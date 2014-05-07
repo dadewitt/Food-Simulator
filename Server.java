@@ -147,10 +147,8 @@ class ThreadHandler implements Runnable {
 	conn = getConnection();
         Statement stat = conn.createStatement();
 	
-	ResultSet result = stat.executeQuery( "UPDATE user " + 
-											"SET latitude=" + args[3] + ", longitude=" + args[4] + ", score=" + args[6] + " " + 
-											"WHERE mac='" + args[5] + "' IF @@ROWCOUNT=0 " + 
-											"INSERT INTO user VALUES (0," + args[3] + "," + args[4] + ",'" + args[5] + "'," + args[6] + ")");
+	ResultSet result = stat.executeQuery( "INSERT INTO user (mac, latitude, longitude, score) values ('" + args[5] + "'," + args[3] + "," + args[4] + "," + args[6]") " + 
+											"on duplicate key update latitude=values(latitude), longitude=values(longitude), score=values(score);");
 
 	/*while(result.next()) {
        		out.print(result.getString(1)+"|");
