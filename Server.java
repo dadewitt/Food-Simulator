@@ -118,6 +118,8 @@ class ThreadHandler implements Runnable {
 		if (command.equals("TEST")) {
 			System.out.println("Do the test");
 			testDB(args, out);
+		} else if (command.equals("SAVE")) {
+			saveDB(args, out);
 		}
 		/*
 		if (command.equals("GET-ALL-PETS")) {
@@ -135,6 +137,44 @@ class ThreadHandler implements Runnable {
 		System.out.println(e.toString());
 		out.println(e.toString());
 	}
+   }
+   
+    void saveDB( String [] args, PrintWriter out) {
+
+      Connection conn=null;
+      try
+      {
+	conn = getConnection();
+        Statement stat = conn.createStatement();
+	
+	ResultSet result = stat.executeQuery( "UPDATE user " + 
+											"SET latitude=" + args[3] + ", longitude=" + args[4] + ", score=" + args[6] + " " + 
+											"WHERE mac='" + args[5] + "' IF @@ROWCOUNT=0 " + 
+											"INSERT INTO user VALUES (0," + args[3] + "," + args[4] + ",'" + args[5] + "'," + args[6] + ")");
+
+	/*while(result.next()) {
+       		out.print(result.getString(1)+"|");
+       		out.print(result.getString(2)+"|");
+       		out.print(result.getString(3)+"|");
+       		out.print(result.getString(4)+"|");
+       		out.print(result.getString(5));
+		out.println("");
+	}*/
+
+	result.close();
+      }
+      catch (Exception e) {
+	System.out.println(e.toString());
+	out.println(e.toString());
+      }
+      finally
+      {
+	try {
+         if (conn!=null) conn.close();
+	}
+	catch (Exception e) {
+	}
+      }
    }
    
     void testDB( String [] args, PrintWriter out) {
@@ -157,21 +197,6 @@ class ThreadHandler implements Runnable {
 	}
 
 	result.close();
-
-	/*
- 	stat.executeUpdate(
-           "CREATE TABLE Greetings (Message CHAR(20))");
-        stat.executeUpdate(
-           "INSERT INTO Greetings VALUES ('Hello, World!')");
-	ResultSet result = 
-            stat.executeQuery(
-               "SELECT * FROM Greetings");
-         while(result.next())
-            System.out.println(result.getString(1));
-         result.close();
-         stat.executeUpdate("DROP TABLE Greetings");
-	*/
-
       }
       catch (Exception e) {
 	System.out.println(e.toString());

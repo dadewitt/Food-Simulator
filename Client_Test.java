@@ -25,8 +25,8 @@ public class Client_Test {
 					break;
 				
 				if (cmd.equals("read")) {
-					java.io.BufferedReader rdr = new java.io.BufferedReader( new InputStream( serverCon.getInputStream() ) );
-					System.out.println(rdr.nextLine());
+					java.io.BufferedReader rdr = new java.io.BufferedReader( new java.io.InputStreamReader( serverCon.getInputStream() ) );
+					System.out.println(rdr.readLine());
 				}
 				
 				// Open a PrintWriter to be able to write (string) messages to the server
