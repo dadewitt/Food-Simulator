@@ -189,7 +189,7 @@ class ThreadHandler implements Runnable {
 	System.out.println("QUERY: " + "SELECT latitude, longitude FROM user WHERE score > " + args[4] + " AND mac <> '" + args[3] + "'");
 	double mylat = Double.parseDouble(args[5]);
 	double mylon = Double.parseDouble(args[6]);
-	double closest[3] = { mylat, mylon, 90000001 }
+	double closest[3] = { mylat, mylon, 90000001 };
 	while(result.next()) {
 			System.out.print(result.getString(1)+" ");
 			System.out.println(result.getString(2));
